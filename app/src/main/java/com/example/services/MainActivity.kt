@@ -1,15 +1,14 @@
 package com.example.services
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.services.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -27,47 +26,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.foregroundService.setOnClickListener {
-            requestNotificationPermission()
-        }
-    }
-
-    private fun showNotification() {
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationChannel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
+            askPermission()
+            ContextCompat.startForegroundService(
+                this,
+                MyForegroundService.newIntent(this)
             )
-            notificationChannel.description = CHANNEL_DESCRIPTION
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-
-        notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Title")
-            .setContentText("Text")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
-
-        notificationManager.notify(NOTIFICATION_ID, notification)
-    }
-
-    // TIRAMISU. For verbose -> https://stepik.org/lesson/709339/step/1?unit=709902
-    private fun requestNotificationPermission() {
-        if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-            startActivity(intent)
-        } else {
-            showNotification()
         }
     }
 
-    companion object {
-        private const val NOTIFICATION_ID = 1
-        private const val CHANNEL_ID = "CHANNEL_ID"
-        private const val CHANNEL_NAME = "CHANNEL NAME"
-        private const val CHANNEL_DESCRIPTION = "CHANNEL DESCRIPTION"
+    // c 13 версии нужно спрашивать пользователя разрешение отправлять уведомления.
+    private fun askPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
+            }
+        }
     }
 }

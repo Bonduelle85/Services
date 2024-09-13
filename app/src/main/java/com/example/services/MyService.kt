@@ -4,10 +4,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.os.Message
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -17,9 +17,7 @@ class MyService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        scope.launch {
-            log("onCreate")
-        }
+        log("onCreate")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -34,9 +32,8 @@ class MyService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        scope.launch {
-            log("onDestroy")
-        }
+        log("onDestroy")
+        scope.cancel()
     }
 
     override fun onBind(intent: Intent?): IBinder? { TODO("Not yet implemented") }
