@@ -3,6 +3,9 @@ package com.example.services
 import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -39,9 +42,21 @@ class MainActivity : AppCompatActivity() {
                 MyIntentService.newIntent(this)
             )
         }
+        binding.jobSheduler.setOnClickListener {
+            val componentName = ComponentName(this, MyJobService::class.java)
+
+            val jobInfo = JobInfo.Builder(MyJobService.JOB_SERVICE_ID, componentName)
+                .setPersisted(true) // включение сервиса после перезагрузки устройства (permission RECEIVE_BOOT_COMPLETED)
+                .setRequiresCharging(true) // включеине сервиса только на зарядке
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED) // включеине сервиса только на WiFi
+                .build()
+
+            val jobSheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+            jobSheduler.schedule(jobInfo)
+        }
     }
 
-    // c 13 версии нужно спрашивать пользователя разрешение отправлять уведомления.
+    // c 13 версии нужно спрашивать пользователя разрешение отправлять уведомления (foregroundService).
     private fun askPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
