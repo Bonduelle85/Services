@@ -1,5 +1,6 @@
 package com.example.services
 
+import android.app.IntentService
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -15,40 +16,30 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MyForegroundService : Service() {
-
-    private val scope = CoroutineScope(Dispatchers.Main)
+class MyIntentService() : IntentService(SERVICE_NAME) {
 
     override fun onCreate() {
         super.onCreate()
-        log("onCreate")
+        setIntentRedelivery(true)
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, createNotification())
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        log("onStartCommand")
-        scope.launch {
-            repeat(50) {
-                delay(1000)
-                log("Timer: $it")
-            }
+    override fun onHandleIntent(intent: Intent?) {
+        log("onHandleIntent")
+        repeat(10) {
+            Thread.sleep(1000)
+            log("Timer: $it")
         }
-        return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        scope.cancel()
         log("onDestroy")
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
-    }
-
     private fun log(message: String) {
-        Log.d("SERVICE_TAG", "MyForegroundService: $message")
+        Log.d("SERVICE_TAG", "MyIntentService: $message")
     }
 
     private fun createNotificationChannel() {
@@ -75,7 +66,8 @@ class MyForegroundService : Service() {
         private const val NOTIFICATION_ID = 1
         private const val CHANNEL_ID = "CHANNEL_ID"
         private const val CHANNEL_NAME = "CHANNEL NAME"
+        private const val SERVICE_NAME = "SERVICE_NAME"
 
-        fun newIntent(context: Context) = Intent(context, MyForegroundService::class.java)
+        fun newIntent(context: Context) = Intent(context, MyIntentService::class.java)
     }
 }

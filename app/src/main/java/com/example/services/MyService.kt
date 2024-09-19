@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class MyService : Service() {
 
-    val scope = CoroutineScope(Dispatchers.Main)
+    val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate() {
         super.onCreate()
@@ -21,25 +21,28 @@ class MyService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        scope.launch {
+        log("onStartCommand")
+        coroutineScope.launch {
             repeat(50) {
                 delay(1000)
-                log("onStartCommand..$it")
+                log("Timer: $it")
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+        return START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {
         super.onDestroy()
         log("onDestroy")
-        scope.cancel()
+        coroutineScope.cancel()
     }
 
-    override fun onBind(intent: Intent?): IBinder? { TODO("Not yet implemented") }
+    override fun onBind(intent: Intent?): IBinder? {
+        TODO("Not yet implemented")
+    }
 
     private fun log(message: String) {
-        Log.d("MyService", "$this: $message")
+        Log.d("SERVICE_TAG", "MyService: $message")
     }
 
     companion object {

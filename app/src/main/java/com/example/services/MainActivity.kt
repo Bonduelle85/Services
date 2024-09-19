@@ -32,6 +32,13 @@ class MainActivity : AppCompatActivity() {
                 MyForegroundService.newIntent(this)
             )
         }
+        binding.intentService.setOnClickListener {
+            askPermission()
+            ContextCompat.startForegroundService(
+                this,
+                MyIntentService.newIntent(this)
+            )
+        }
     }
 
     // c 13 версии нужно спрашивать пользователя разрешение отправлять уведомления.
