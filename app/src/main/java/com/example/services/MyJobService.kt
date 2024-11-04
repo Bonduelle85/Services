@@ -1,9 +1,7 @@
 package com.example.services
 
-import android.app.Service
-import android.content.Context
-import android.content.Intent
-import android.os.IBinder
+import android.app.job.JobParameters
+import android.app.job.JobService
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,24 +9,31 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MyService : Service() {
+class MyJobService : JobService() {
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate() {
         super.onCreate()
         log("onCreate")
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        log("onStartCommand")
+    override fun onStartJob(params: JobParameters?): Boolean {
+        log("onStartJob")
         coroutineScope.launch {
             repeat(50) {
                 delay(1000)
                 log("Timer: $it")
             }
+            jobFinished(params, true)
+                // true = need to reschedule the service?
         }
-        return START_REDELIVER_INTENT
+        return true  // true = the service continues to run
+    }
+
+    override fun onStopJob(params: JobParameters?): Boolean {
+        log("onStopJob")
+        return true // true = the service will be scheduled to run again
     }
 
     override fun onDestroy() {
@@ -37,15 +42,12 @@ class MyService : Service() {
         coroutineScope.cancel()
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
-    }
-
     private fun log(message: String) {
-        Log.d("SERVICE_TAG", "MyService: $message")
+        Log.d("SERVICE_TAG", "MyJobService: $message")
     }
 
     companion object {
-        fun newIntent(context: Context) = Intent(context, MyService::class.java)
+
+        const val JOB_ID = 1
     }
 }
