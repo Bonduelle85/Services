@@ -26,13 +26,14 @@ class MyJobService : JobService() {
                 log("Timer: $it")
             }
             jobFinished(params, true)
+                // true = need to reschedule the service?
         }
-        return true
+        return true  // true = the service continues to run
     }
 
     override fun onStopJob(params: JobParameters?): Boolean {
         log("onStopJob")
-        return true
+        return true // true = the service will be scheduled to run again
     }
 
     override fun onDestroy() {
@@ -46,6 +47,7 @@ class MyJobService : JobService() {
     }
 
     companion object {
-        const val JOB_SERVICE_ID = 1
+
+        const val JOB_ID = 1
     }
 }

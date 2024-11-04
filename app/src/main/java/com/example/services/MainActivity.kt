@@ -17,8 +17,6 @@ import com.example.services.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    private lateinit var notification: Notification
-    private lateinit var notificationChannel: NotificationChannel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +43,14 @@ class MainActivity : AppCompatActivity() {
         binding.jobSheduler.setOnClickListener {
             val componentName = ComponentName(this, MyJobService::class.java)
 
-            val jobInfo = JobInfo.Builder(MyJobService.JOB_SERVICE_ID, componentName)
+            val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
                 .setPersisted(true) // включение сервиса после перезагрузки устройства (permission RECEIVE_BOOT_COMPLETED)
                 .setRequiresCharging(true) // включеине сервиса только на зарядке
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED) // включеине сервиса только на WiFi
                 .build()
 
-            val jobSheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobSheduler.schedule(jobInfo)
+            val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+            jobScheduler.schedule(jobInfo)
         }
     }
 
