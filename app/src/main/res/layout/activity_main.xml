@@ -34,20 +34,30 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/intent_service"
-        app:layout_constraintBottom_toTopOf="@+id/jobSheduler"
+        app:layout_constraintBottom_toTopOf="@+id/jobScheduler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/foregroundService" />
 
     <Button
-        android:id="@+id/jobSheduler"
+        android:id="@+id/jobScheduler"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/job_sheduler"
-        app:layout_constraintBottom_toTopOf="@+id/jobIntentService"
+        android:text="@string/job_scheduler"
+        app:layout_constraintBottom_toTopOf="@+id/jobSchedulerEnqueue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/intentService" />
+
+    <Button
+        android:id="@+id/jobSchedulerEnqueue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/job_scheduler_enqueue"
+        app:layout_constraintBottom_toTopOf="@+id/jobIntentService"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/jobScheduler" />
 
     <Button
         android:id="@+id/jobIntentService"
@@ -57,7 +67,7 @@
         app:layout_constraintBottom_toTopOf="@+id/alarmManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/jobSheduler" />
+        app:layout_constraintTop_toBottomOf="@+id/jobSchedulerEnqueue" />
 
     <Button
         android:id="@+id/alarmManager"

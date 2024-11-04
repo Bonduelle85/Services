@@ -17,6 +17,7 @@ import com.example.services.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private var page = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,13 +41,25 @@ class MainActivity : AppCompatActivity() {
                 MyIntentService.newIntent(this)
             )
         }
-        binding.jobSheduler.setOnClickListener {
+        binding.jobScheduler.setOnClickListener {
             val componentName = ComponentName(this, MyJobService::class.java)
 
             val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
                 .setPersisted(true) // включение сервиса после перезагрузки устройства (permission RECEIVE_BOOT_COMPLETED)
                 .setRequiresCharging(true) // включеине сервиса только на зарядке
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED) // включеине сервиса только на WiFi
+                .build()
+
+            val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+            jobScheduler.schedule(jobInfo)
+        }
+        binding.jobSchedulerEnqueue.setOnClickListener {
+            val componentName = ComponentName(this, MyJobServiceEnqueue::class.java)
+
+            val jobInfo = JobInfo.Builder(MyJobServiceEnqueue.JOB_ID, componentName)
+                .setExtras(MyJobServiceEnqueue.newBundle(page++))
+                .setRequiresCharging(true)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .build()
 
             val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
