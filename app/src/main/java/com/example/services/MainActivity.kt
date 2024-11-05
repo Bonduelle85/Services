@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
+import android.app.job.JobWorkItem
 import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.os.Build
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
                 MyForegroundService.newIntent(this)
             )
         }
+
         binding.intentService.setOnClickListener {
             askPermission()
             ContextCompat.startForegroundService(
@@ -41,29 +43,34 @@ class MainActivity : AppCompatActivity() {
                 MyIntentService.newIntent(this)
             )
         }
+
         binding.jobScheduler.setOnClickListener {
             val componentName = ComponentName(this, MyJobService::class.java)
 
             val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
-                .setPersisted(true) // включение сервиса после перезагрузки устройства (permission RECEIVE_BOOT_COMPLETED)
-                .setRequiresCharging(true) // включеине сервиса только на зарядке
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED) // включеине сервиса только на WiFi
-                .build()
-
-            val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobScheduler.schedule(jobInfo)
-        }
-        binding.jobSchedulerEnqueue.setOnClickListener {
-            val componentName = ComponentName(this, MyJobServiceEnqueue::class.java)
-
-            val jobInfo = JobInfo.Builder(MyJobServiceEnqueue.JOB_ID, componentName)
-                .setExtras(MyJobServiceEnqueue.newBundle(page++))
+                .setPersisted(true)
                 .setRequiresCharging(true)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .build()
 
             val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
             jobScheduler.schedule(jobInfo)
+        }
+
+        binding.jobSchedulerEnqueue.setOnClickListener {
+            val componentName = ComponentName(this, MyJobServiceEnqueue::class.java)
+
+            val jobInfo = JobInfo.Builder(MyJobServiceEnqueue.JOB_ID, componentName)
+                .setRequiresCharging(true)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .build()
+
+            val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val intent = MyJobServiceEnqueue.newIntent(page++)
+                jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
+            }
         }
     }
 
