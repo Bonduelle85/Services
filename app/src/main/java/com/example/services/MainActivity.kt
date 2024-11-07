@@ -72,6 +72,9 @@ class MainActivity : AppCompatActivity() {
                 jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
             }
         }
+        binding.jobIntentService.setOnClickListener {
+            MyJobIntentService.enqueue(this, page++)
+        }
     }
 
     // c 13 версии нужно спрашивать пользователя разрешение отправлять уведомления (foregroundService).
