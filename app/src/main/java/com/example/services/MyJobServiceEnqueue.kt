@@ -35,7 +35,7 @@ class MyJobServiceEnqueue : JobService() {
                     params?.completeWork(workItem)
                     workItem = params?.dequeueWork()
                 }
-                jobFinished(params, true)
+                jobFinished(params, false)
             }
         }
         return true
